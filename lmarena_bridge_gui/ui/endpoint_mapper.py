@@ -8,7 +8,7 @@ import logging
 from typing import Dict, Any, List, Optional
 from gi.repository import Gtk, Adw, GObject, GLib
 
-from ...settings import load_model_endpoint_map
+from lmarena_bridge.settings import load_model_endpoint_map
 from ..utils.notifications import show_error_async, show_info_async
 
 logger = logging.getLogger(__name__)

@@ -8,8 +8,9 @@ from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
 from typing import Dict, Any
 import asyncio
 import time
+import json
 
-from ..settings import load_settings
+from ..settings import load_settings, update_config_partial
 from ..services.websocket_hub import websocket_hub
 
 logger = logging.getLogger(__name__)
@@ -53,6 +54,21 @@ async def get_config() -> Dict[str, Any]:
     }
     
     return safe_config
+
+
+@router.patch("/internal/config", tags=["internal"])
+async def update_config(request_data: Dict[str, Any]) -> Dict[str, str]:
+    """
+    Update server configuration with partial updates.
+    """
+    try:
+        success = update_config_partial(request_data)
+        if success:
+            return {"status": "ok"}
+        else:
+            raise HTTPException(status_code=500, detail="Failed to update configuration")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/internal/status", tags=["internal"])
@@ -214,3 +230,92 @@ async def get_server_info() -> Dict[str, Any]:
     }
     
     return info
+
+
+@router.post("/internal/id_capture/start", tags=["internal"])
+async def start_id_capture() -> Dict[str, str]:
+    """
+    Activate ID capture mode in the browser.
+    This endpoint signals the userscript to listen for session and message IDs.
+    """
+    # In a real implementation, this would send a command to the browser via WebSocket
+    # For now, we'll just return success
+    if await websocket_hub.has_connections():
+        return {"status": "ok"}
+    else:
+        raise HTTPException(status_code=503, detail="No browser connected")
+
+
+@router.post("/internal/id_capture/update", tags=["internal"])
+async def update_ids(request_data: Dict[str, str]) -> Dict[str, str]:
+    """
+    Update the session and message IDs from the userscript.
+    Expected payload: {"sessionId": "...", "messageId": "..."}
+    """
+    session_id = request_data.get("sessionId")
+    message_id = request_data.get("messageId")
+    
+    if not session_id or not message_id:
+        raise HTTPException(status_code=400, detail="sessionId and messageId are required")
+    
+    # Update the config with the new IDs
+    updates = {
+        "session_id": session_id,
+        "message_id": message_id
+    }
+    
+    success = update_config_partial(updates)
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to update configuration")
+    
+    return {"status": "ok"}
+
+
+@router.post("/internal/request_model_update", tags=["internal"])
+async def request_model_update() -> Dict[str, str]:
+    """
+    Request the userscript to send the current page source for model extraction.
+    """
+    if await websocket_hub.has_connections():
+        # In a real implementation, this would send a command to the browser to
+        # extract and send available models
+        return {"status": "success"}
+    else:
+        raise HTTPException(status_code=503, detail="No browser connected")
+
+
+@router.post("/internal/update_available_models", tags=["internal"])
+async def update_available_models(request_data: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Update the available models list from raw page source.
+    """
+    import re
+    from pathlib import Path
+    
+    # Extract models from HTML source
+    html_content = request_data.get("html", "")
+    
+    # Find all model IDs in the page (this is a simplified approach)
+    # In a real implementation, you'd parse the actual model list from LMArena
+    model_pattern = r'"id"\s*:\s*"([^"]+)"'
+    model_ids = re.findall(model_pattern, html_content)
+    
+    # Load the models config file
+    from ..settings import CONFIG_DIR
+    models_file = CONFIG_DIR / "available_models.json"
+    
+    # Create models dictionary
+    models = {}
+    for model_id in model_ids:
+        if not model_id.startswith("file-") and len(model_id) > 10:  # Filter out file-based models
+            models[model_id] = f"{model_id}:text"  # Default to text type
+    
+    # Save the models
+    try:
+        import json
+        with open(models_file, 'w', encoding='utf-8') as f:
+            json.dump(models, f, indent=2)
+        
+        return {"status": "success", "count": len(models)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to update models: {str(e)}")

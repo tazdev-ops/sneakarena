@@ -8,7 +8,7 @@ import logging
 from typing import Dict, Any
 from gi.repository import Gtk, Adw, GObject, GLib
 
-from ...settings import load_models, create_default_models
+from lmarena_bridge.settings import load_models, create_default_models
 from ..utils.notifications import show_error_async, show_info_async
 
 logger = logging.getLogger(__name__)

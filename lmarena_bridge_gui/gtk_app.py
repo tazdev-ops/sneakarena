@@ -5,6 +5,9 @@ Main entry point for the LMArena Bridge GTK4 GUI application.
 import sys
 import logging
 import signal
+import gi
+gi.require_version('Gtk', '4.0')
+gi.require_version('Adw', '1')
 from gi.repository import Gtk, Adw, Gio
 
 from .ui.main_window import MainWindow
@@ -13,7 +16,7 @@ from .utils.notifications import NotificationManager
 from .ui.log_viewer import LogViewer
 
 # Initialize logging first
-from ..logging_config import setup_logging
+from lmarena_bridge.logging_config import setup_logging
 setup_logging(debug=False)
 
 
