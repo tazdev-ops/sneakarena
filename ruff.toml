@@ -1,0 +1,50 @@
+# Project-specific ruff configuration
+
+# Set line length to 100 characters
+line-length = 100
+
+# Set target Python version to 3.10
+target-version = "py310"
+
+[lint]
+# Enable the following rule sets:
+# E: pycodestyle errors
+# W: pycodestyle warnings
+# F: Pyflakes
+# I: isort
+# UP: pyupgrade
+# B: flake8-bugbear
+# SIM: flake8-simplify
+# TCH: flake8-type-checking
+select = ["E", "W", "F", "I", "UP", "B", "SIM", "TCH"]
+
+# Ignore the following rules:
+# E501: line too long (we use line-length setting instead)
+ignore = ["E501"]
+
+# Allow fix for all enabled rules (when possible)
+fixable = ["ALL"]
+unfixable = []
+
+# Exclude a variety of commonly ignored directories.
+extend-ignore = [
+    # Allow type: ignore comments without explanation
+    "PGH003",
+]
+
+[format]
+# Like Black, use double quotes for strings.
+quote-style = "double"
+
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+
+# Enable auto-detection of the current line ending.
+line-ending = "auto"
+
+[lint.pyupgrade]
+# Preserve types, even if a file imports `from __future__ import annotations`.
+keep-runtime-typing = true

@@ -1,0 +1,13 @@
+{
+  // LMArena Models Configuration
+  // Map friendly model names to LMArena model IDs
+  // Format: "friendly_name": "model_uuid[:type]"
+  // Type can be "text" (default) or "image"
+  
+  "gemini-2.5-pro": "YOUR_MODEL_ID:text",
+  "gpt-4": "YOUR_MODEL_ID:text", 
+  "gpt-4-turbo": "YOUR_MODEL_ID:text",
+  "claude-3-opus": "YOUR_MODEL_ID:text",
+  "dall-e-3": "null:image",
+  "midjourney": "null:image"
+}

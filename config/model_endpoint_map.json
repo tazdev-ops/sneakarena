@@ -1,0 +1,30 @@
+{
+  // Model Endpoint Mapping Configuration
+  // Map specific models to specific sessions/modes
+  // This allows different models to use different LMArena sessions
+  
+  // Example of mapping a model to a specific session
+  // "model_name": {
+  //   "session_id": "specific-session-uuid",
+  //   "message_id": "specific-message-uuid", 
+  //   "mode": "direct_chat",  // or "battle"
+  //   "battle_target": "A"    // only for battle mode
+  // }
+  
+  // Example of mapping with multiple options (random selection)
+  // "gpt-5": [
+  //   {
+  //     "session_id": "session-1-uuid",
+  //     "message_id": "message-1-uuid",
+  //     "mode": "direct_chat"
+  //   },
+  //   {
+  //     "session_id": "session-2-uuid", 
+  //     "message_id": "message-2-uuid",
+  //     "mode": "battle",
+  //     "battle_target": "A"
+  //   }
+  // ]
+  
+  // Default - empty mapping (will use global config)
+}

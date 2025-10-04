@@ -1,0 +1,12 @@
+[Unit]
+Description=LMArena Bridge (user)
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=%h/.local/share/pipx/venvs/lmarena-bridge/bin/lmarena-bridge
+Restart=on-failure
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=default.target
